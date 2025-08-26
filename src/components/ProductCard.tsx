@@ -23,32 +23,52 @@ const ProductCard = ({ product }: ProductCardProps) => {
     });
   };
 
-  const getCategoryLabel = (category: string) => {
-    const labels = {
+  const getCategoryLabel = (categoryName: string): string => {
+    const labels: { [key: string]: string } = {
       'tissus': 'Tissus',
+      'tissu': 'Tissu',
       'artisanat': 'Artisanat',
       'epices': 'Épices',
-      'bijoux': 'Bijoux'
+      'épices': 'Épices',
+      'bijoux': 'Bijoux',
+      'hommes': 'Hommes',
+      'femmes': 'Femmes',
+      'enfants': 'Enfants'
     };
-    return labels[category as keyof typeof labels] || category;
+    return labels[categoryName.toLowerCase()] || categoryName;
   };
 
-  const getCategoryColor = (category: string) => {
-    const colors = {
-      'tissus': 'bg-primary text-primary-foreground',
-      'artisanat': 'bg-secondary text-secondary-foreground',
-      'epices': 'bg-accent text-accent-foreground',
-      'bijoux': 'bg-warning text-warning-foreground'
-    };
-    return colors[category as keyof typeof colors] || 'bg-muted text-muted-foreground';
+  const getCategoryColor = (categoryName: string): string => {
+    switch (categoryName.toLowerCase()) {
+      case 'tissus':
+      case 'tissu':
+        return 'bg-primary/10 text-primary';
+      case 'artisanat':
+        return 'bg-secondary/10 text-secondary-foreground';
+      case 'epices':
+      case 'épices':
+        return 'bg-accent/10 text-accent-foreground';
+      case 'bijoux':
+        return 'bg-primary/20 text-primary';
+      case 'hommes':
+        return 'bg-blue-100 text-blue-800';
+      case 'femmes':
+        return 'bg-pink-100 text-pink-800';
+      case 'enfants':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
+
+  const categoryName = product.category?.name || 'Produit';
 
   return (
     <Card className="group hover:shadow-senegal transition-all duration-300 animate-fade-in-up">
       <CardContent className="p-0">
         <div className="relative overflow-hidden rounded-t-lg">
           <img
-            src={product.image}
+            src={product.image_url || '/placeholder.svg'}
             alt={product.name}
             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -57,8 +77,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
               Vedette
             </Badge>
           )}
-          <Badge className={`absolute top-2 right-2 ${getCategoryColor(product.category)}`}>
-            {getCategoryLabel(product.category)}
+          <Badge className={`absolute top-2 right-2 ${getCategoryColor(categoryName)}`}>
+            {getCategoryLabel(categoryName)}
           </Badge>
         </div>
         <div className="p-4">

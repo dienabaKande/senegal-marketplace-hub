@@ -1,20 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
-import { products } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
+import { Product } from '@/types/product';
 import { ArrowLeft, ShoppingCart, Plus, Minus, Heart, Share2 } from 'lucide-react';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [quantity, setQuantity] = useState(1);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const { toast } = useToast();
-  
-  const product = products.find(p => p.id === id);
+  const { getProductById, products } = useProducts();
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!id) return;
+      
+      setLoading(true);
+      const productData = await getProductById(id);
+      setProduct(productData);
+      setLoading(false);
+    };
+
+    fetchProduct();
+  }, [id, getProductById]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Chargement...</h2>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -40,18 +65,25 @@ const ProductDetail = () => {
     });
   };
 
-  const getCategoryLabel = (category: string) => {
-    const labels = {
+  const getCategoryLabel = (categoryName: string): string => {
+    const labels: { [key: string]: string } = {
       'tissus': 'Tissus',
+      'tissu': 'Tissu',
       'artisanat': 'Artisanat',
       'epices': 'Épices',
-      'bijoux': 'Bijoux'
+      'épices': 'Épices',
+      'bijoux': 'Bijoux',
+      'hommes': 'Hommes',
+      'femmes': 'Femmes',
+      'enfants': 'Enfants'
     };
-    return labels[category as keyof typeof labels] || category;
+    return labels[categoryName.toLowerCase()] || categoryName;
   };
 
+  const categoryName = product.category?.name || 'Produit';
+
   const relatedProducts = products
-    .filter(p => p.category === product.category && p.id !== product.id)
+    .filter(p => p.category_id === product.category_id && p.id !== product.id)
     .slice(0, 3);
 
   return (
@@ -79,7 +111,7 @@ const ProductDetail = () => {
           <div className="space-y-4">
             <div className="aspect-square overflow-hidden rounded-lg bg-muted">
               <img
-                src={product.image}
+                src={product.image_url || '/placeholder.svg'}
                 alt={product.name}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -91,7 +123,7 @@ const ProductDetail = () => {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <Badge variant="secondary">
-                  {getCategoryLabel(product.category)}
+                  {getCategoryLabel(categoryName)}
                 </Badge>
                 {product.featured && (
                   <Badge className="bg-accent text-accent-foreground">
@@ -171,7 +203,7 @@ const ProductDetail = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Catégorie :</span>
-                    <span>{getCategoryLabel(product.category)}</span>
+                    <span>{getCategoryLabel(categoryName)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Disponibilité :</span>
@@ -198,7 +230,7 @@ const ProductDetail = () => {
                     <Link to={`/product/${relatedProduct.id}`}>
                       <div className="aspect-square overflow-hidden rounded-t-lg">
                         <img
-                          src={relatedProduct.image}
+                          src={relatedProduct.image_url || '/placeholder.svg'}
                           alt={relatedProduct.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />

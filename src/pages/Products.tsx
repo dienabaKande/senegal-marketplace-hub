@@ -1,23 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ProductCard from '@/components/ProductCard';
-import { products } from '@/data/products';
-import { Search, Filter } from 'lucide-react';
+import { useProducts } from '@/hooks/useProducts';
+import { Search, Filter, Loader2 } from 'lucide-react';
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('name');
-
-  const categories = [
-    { value: 'all', label: 'Toutes les catégories' },
-    { value: 'tissus', label: 'Tissus' },
-    { value: 'artisanat', label: 'Artisanat' },
-    { value: 'epices', label: 'Épices' },
-    { value: 'bijoux', label: 'Bijoux' }
-  ];
+  
+  const { products, categories, loading, error } = useProducts();
 
   const sortOptions = [
     { value: 'name', label: 'Nom (A-Z)' },
@@ -29,8 +23,8 @@ const Products = () => {
   const filteredAndSortedProducts = products
     .filter(product => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+                          (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesCategory = selectedCategory === 'all' || product.category_id === selectedCategory;
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
@@ -45,6 +39,28 @@ const Products = () => {
           return a.name.localeCompare(b.name);
       }
     });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-4">Chargement des produits...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4 text-destructive">Erreur</h2>
+          <p className="text-muted-foreground">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-8">
@@ -82,9 +98,10 @@ const Products = () => {
                 <SelectValue placeholder="Catégorie" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">Toutes les catégories</SelectItem>
                 {categories.map(category => (
-                  <SelectItem key={category.value} value={category.value}>
-                    {category.label}
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -132,7 +149,7 @@ const Products = () => {
         </div>
 
         {/* No Results */}
-        {filteredAndSortedProducts.length === 0 && (
+        {filteredAndSortedProducts.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="w-24 h-24 mx-auto mb-6 bg-muted rounded-full flex items-center justify-center">
               <Search className="h-12 w-12 text-muted-foreground" />
