@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCart } from '@/contexts/CartContext';
-import { Menu, ShoppingCart, X } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Menu, ShoppingCart, X, User, LogOut } from 'lucide-react';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { getCartItemsCount } = useCart();
+  const { user, signOut, isAdmin } = useAuth();
 
   const navItems = [
     { href: '/', label: 'Accueil' },
@@ -17,6 +19,14 @@ const Navigation = () => {
     { href: '/about', label: 'À propos' },
     { href: '/contact', label: 'Contact' }
   ];
+
+  if (user && isAdmin) {
+    navItems.push({ href: '/admin', label: 'Admin' });
+  }
+
+  if (!user) {
+    navItems.push({ href: '/auth', label: 'Connexion' });
+  }
 
   const isActive = (href: string) => {
     if (href === '/' && location.pathname === '/') return true;
@@ -31,9 +41,9 @@ const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-primary rounded-md flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">SN</span>
+              <span className="text-primary-foreground font-bold text-sm">NS</span>
             </div>
-            <span className="font-bold text-xl text-foreground">SénégalShop</span>
+            <span className="font-bold text-xl text-foreground">NdiongueShop</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -53,7 +63,7 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* Cart & Mobile Menu */}
+          {/* Cart & Auth Actions */}
           <div className="flex items-center space-x-4">
             <Link to="/cart">
               <Button variant="outline" size="sm" className="relative">
@@ -68,6 +78,18 @@ const Navigation = () => {
                 )}
               </Button>
             </Link>
+
+            {user && (
+              <Button 
+                onClick={() => signOut()}
+                variant="outline" 
+                size="sm"
+                className="hidden md:flex"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Déconnexion
+              </Button>
+            )}
 
             {/* Mobile Menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -90,6 +112,20 @@ const Navigation = () => {
                       {item.label}
                     </Link>
                   ))}
+                  {user && (
+                    <Button 
+                      onClick={() => {
+                        signOut();
+                        setIsOpen(false);
+                      }}
+                      variant="outline" 
+                      size="sm"
+                      className="w-full justify-start"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Déconnexion
+                    </Button>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>

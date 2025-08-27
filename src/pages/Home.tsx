@@ -68,7 +68,7 @@ const Home = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Pourquoi choisir SénégalShop ?</h2>
+            <h2 className="text-4xl font-bold mb-4">Pourquoi choisir NdiongueShop ?</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Nous nous engageons à vous offrir le meilleur de l'artisanat sénégalais
             </p>
@@ -134,7 +134,7 @@ const Home = () => {
             Prêt à découvrir l'authenticité sénégalaise ?
           </h2>
           <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Rejoignez des milliers de clients satisfaits qui font confiance à SénégalShop
+            Rejoignez des milliers de clients satisfaits qui font confiance à NdiongueShop
             pour leurs achats d'artisanat authentique.
           </p>
           <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">

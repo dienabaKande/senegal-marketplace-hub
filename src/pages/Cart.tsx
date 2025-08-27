@@ -169,8 +169,10 @@ const Cart = () => {
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col gap-3">
-                <Button className="w-full" size="lg">
-                  Procéder au paiement
+                <Button asChild className="w-full" size="lg">
+                  <Link to="/checkout">
+                    Procéder au paiement
+                  </Link>
                 </Button>
                 <Button asChild variant="outline" className="w-full">
                   <Link to="/products">
