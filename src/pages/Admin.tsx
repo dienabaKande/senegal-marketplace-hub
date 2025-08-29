@@ -244,10 +244,10 @@ const Admin = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
-            Tableau de bord
+            Dashboard
           </TabsTrigger>
           <TabsTrigger value="products" className="flex items-center gap-2">
             <ShoppingCart className="h-4 w-4" />
@@ -258,6 +258,7 @@ const Admin = () => {
             Commandes
           </TabsTrigger>
           <TabsTrigger value="categories">Catégories</TabsTrigger>
+          <TabsTrigger value="settings">Paramètres</TabsTrigger>
         </TabsList>
 
         <TabsContent value="dashboard" className="space-y-6">
@@ -499,22 +500,235 @@ const Admin = () => {
         <TabsContent value="categories" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Catégories</CardTitle>
-              <CardDescription>Les catégories de produits</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Gestion des Catégories</CardTitle>
+                  <CardDescription>Créez et gérez les catégories de produits</CardDescription>
+                </div>
+                <Button onClick={() => setActiveTab('add-category')} className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Nouvelle Catégorie
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {categories.map((category) => (
-                  <Card key={category.id}>
+                  <Card key={category.id} className="relative">
+                    {category.image_url && (
+                      <div className="aspect-video w-full">
+                        <img 
+                          src={category.image_url} 
+                          alt={category.name}
+                          className="w-full h-full object-cover rounded-t-lg"
+                        />
+                      </div>
+                    )}
                     <CardHeader>
                       <CardTitle className="text-lg">{category.name}</CardTitle>
-                      <CardDescription>{category.description}</CardDescription>
+                      <CardDescription>{category.description || 'Aucune description'}</CardDescription>
                     </CardHeader>
+                    <CardContent>
+                      <div className="flex justify-between items-center">
+                        <Badge variant="secondary" className="text-xs">
+                          {products.filter(p => p.category_id === category.id).length} produits
+                        </Badge>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
                   </Card>
                 ))}
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="add-category" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Ajouter une Catégorie</CardTitle>
+              <CardDescription>Créez une nouvelle catégorie de produits</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="max-w-md space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="category-name">Nom de la catégorie</Label>
+                  <Input
+                    id="category-name"
+                    placeholder="Ex: Vêtements traditionnels"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="category-slug">Slug URL</Label>
+                  <Input
+                    id="category-slug"
+                    placeholder="vetements-traditionnels"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="category-description">Description</Label>
+                  <Textarea
+                    id="category-description"
+                    placeholder="Description de la catégorie"
+                    rows={3}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="category-image">URL de l'image</Label>
+                  <Input
+                    id="category-image"
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <Button type="submit" className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Créer la Catégorie
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => setActiveTab('categories')}
+                  >
+                    Retour
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Informations de la boutique</CardTitle>
+                <CardDescription>Gérez les informations de NdiongueShop</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Nom de la boutique</Label>
+                  <Input value="NdiongueShop" readOnly />
+                </div>
+                <div className="space-y-2">
+                  <Label>Adresse</Label>
+                  <Input value="Keur Massar, Dakar, Sénégal" readOnly />
+                </div>
+                <div className="space-y-2">
+                  <Label>Téléphone</Label>
+                  <Input value="778 577 206" readOnly />
+                </div>
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input value="contact@ndiongue.shop" readOnly />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Méthodes de paiement</CardTitle>
+                <CardDescription>Configurez les options de paiement</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">W</span>
+                    </div>
+                    <div>
+                      <p className="font-medium">Wave</p>
+                      <p className="text-sm text-muted-foreground">Paiement mobile Wave</p>
+                    </div>
+                  </div>
+                  <Badge variant="default">Actif</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-orange-600 rounded flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">O</span>
+                    </div>
+                    <div>
+                      <p className="font-medium">Orange Money</p>
+                      <p className="text-sm text-muted-foreground">Paiement Orange Money</p>
+                    </div>
+                  </div>
+                  <Badge variant="default">Actif</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">💵</span>
+                    </div>
+                    <div>
+                      <p className="font-medium">Paiement à la livraison</p>
+                      <p className="text-sm text-muted-foreground">Espèces à la réception</p>
+                    </div>
+                  </div>
+                  <Badge variant="default">Actif</Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Statistiques avancées</CardTitle>
+                <CardDescription>Analysez les performances de votre boutique</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 border rounded-lg">
+                    <p className="text-2xl font-bold text-primary">{((orders.filter(o => o.status === 'delivered').length / orders.length) * 100 || 0).toFixed(1)}%</p>
+                    <p className="text-sm text-muted-foreground">Taux de livraison</p>
+                  </div>
+                  <div className="text-center p-4 border rounded-lg">
+                    <p className="text-2xl font-bold text-primary">{(stats.totalRevenue / stats.totalOrders || 0).toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">Panier moyen (FCFA)</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Produits les plus vendus</span>
+                    <span>Vêtements traditionnels</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Méthode de paiement populaire</span>
+                    <span>Wave</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Actions rapides</CardTitle>
+                <CardDescription>Raccourcis pour les tâches courantes</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button className="w-full justify-start" variant="outline" onClick={() => setActiveTab('products')}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter un produit
+                </Button>
+                <Button className="w-full justify-start" variant="outline" onClick={() => setActiveTab('orders')}>
+                  <Package className="h-4 w-4 mr-2" />
+                  Voir les nouvelles commandes
+                </Button>
+                <Button className="w-full justify-start" variant="outline" onClick={() => setActiveTab('categories')}>
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Gérer les catégories
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

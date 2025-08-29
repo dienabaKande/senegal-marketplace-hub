@@ -96,8 +96,9 @@ const Auth = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="signin">Connexion</TabsTrigger>
+              <TabsTrigger value="admin">Admin</TabsTrigger>
               <TabsTrigger value="signup">Inscription</TabsTrigger>
             </TabsList>
             
@@ -129,6 +130,46 @@ const Auth = () => {
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Se connecter
                 </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="admin">
+              <form onSubmit={handleSignIn} className="space-y-4">
+                <div className="bg-muted p-4 rounded-lg mb-4">
+                  <h3 className="font-semibold text-sm mb-2">Connexion Administrateur</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Utilisez les identifiants administrateur pour accéder au tableau de bord
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="admin-email">Email Administrateur</Label>
+                  <Input
+                    id="admin-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@ndiongue.shop"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="admin-password">Mot de passe</Label>
+                  <Input
+                    id="admin-password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Connexion Admin
+                </Button>
+                <div className="text-xs text-center text-muted-foreground mt-2">
+                  Réservé aux administrateurs uniquement
+                </div>
               </form>
             </TabsContent>
             
